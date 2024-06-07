@@ -1,0 +1,21 @@
+{
+  "id": 20,
+  "name": "Item_98",
+  "price": 39.12,
+  "is_available": false,
+  "tags": [
+      "book",
+      "tool",
+      "clothing"
+  ],
+  "dimensions": {
+      "width": 7,
+      "height": 20,
+      "depth": 14
+  },
+  "manufacturer": {
+      "name": "Company_1",
+      "location": "Japan"
+  },
+  "date": "2017-03-28"
+}

@@ -1,0 +1,37 @@
+{{ if .Values.deployment.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}
+  namespace: {{ .Values.namespace}}
+  labels:
+    app: {{ .Values.app.name }}
+  annotations:
+    {{- if .Values.app.configReload.enabled }}
+    reloader.sttakater.com/auto: "true"
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}
+    spec:
+      containers:
+        - name: {{ .Values.app.name }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          resources:
+            limits:
+              cpu: {{ .Values.app.resources.limits.cpu }}
+              memory: {{ .Values.app.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.app.resources.requests.cpu }}
+              memory: {{ .Values.app.resources.requests.memory }}
+          ports:
+            - containerPort: {{ .Values.app.port }}
+          volumeMounts: {{ toYaml .Values.app.volumeMounts | nindent 12 }}
+      volumes: {{ toYaml .Values.app.volumes | nindent 10 }}
+{{ end }}

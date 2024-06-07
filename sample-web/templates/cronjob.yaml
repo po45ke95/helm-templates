@@ -1,0 +1,29 @@
+{{ if .Values.cronjob.enabled }}
+apiVersion: betch/v1
+kind: CronJob
+metadata:
+  name: {{ .Values.app.name }}-cronjob
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.app.name }}
+spec:
+  schedule: {{ .Values.cronjob.schedule }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: {{ .Values.app.name }}-cronjob
+            image: "{{ .Values.cronjob.image.name }}:{{ .Values.cronjob.image.tag }}"
+            resources:
+              limits:
+                cpu: {{ .Values.cronjob.resources.limits.cpu }}
+                memory: {{ .Values.cronjob.resources.limits.memory }}
+              requests:
+                cpu: {{ .Values.cronjob.resources.requests.cpu }}
+                memory: {{ .Values.cronjob.resources.requests.memory }}
+            volumeMounts: {{ toYaml .Values.cronjob.volumeMounts | nindent 12 }}
+          restartPolicy: OnFailure
+          volumes: {{ toYaml .Values.cronjob.volumes | nindent 10 }}
+{{ end }}
