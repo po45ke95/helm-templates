@@ -12,7 +12,7 @@
 
 ## Basic Usage  
 - For `Web Application` and `API Server`  
-  - Configuration `sample-web/values.yaml` , only change values.  
+  - Configuration `sample/values.yaml` , only change values.  
     - namespace  
       - Description: Application located where you what  
     - app.name  

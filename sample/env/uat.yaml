@@ -1,4 +1,4 @@
-env: default
+env: uat
 namespace: sample
 
 deployment:

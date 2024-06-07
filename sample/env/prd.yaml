@@ -1,4 +1,4 @@
-env: default
+env: prd
 namespace: sample
 
 deployment:
