@@ -1,29 +1,39 @@
-{{ if .Values.cronjob.enabled }}
+{{- range .Values.cronjobs }}
+{{- if .enabled }}
+---
 apiVersion: betch/v1
 kind: CronJob
 metadata:
-  name: {{ .Values.app.name }}-cronjob
-  namespace: {{ .Values.namespace }}
+  name: {{ .name }}
+  namespace: {{ $.Values.namespace }}
   labels:
-    app: {{ .Values.app.name }}
+    app: {{ .name }}
 spec:
-  schedule: {{ .Values.cronjob.schedule }}
-  concurrencyPolicy: Forbid
+  schedule: {{ .schedule }}
+  concurrencyPolicy: {{ .concurrencyPolicy }}
   jobTemplate:
     spec:
       template:
         spec:
           containers:
-          - name: {{ .Values.app.name }}-cronjob
-            image: "{{ .Values.cronjob.image.name }}:{{ .Values.cronjob.image.tag }}"
-            resources:
-              limits:
-                cpu: {{ .Values.cronjob.resources.limits.cpu }}
-                memory: {{ .Values.cronjob.resources.limits.memory }}
-              requests:
-                cpu: {{ .Values.cronjob.resources.requests.cpu }}
-                memory: {{ .Values.cronjob.resources.requests.memory }}
-            volumeMounts: {{ toYaml .Values.cronjob.volumeMounts | nindent 12 }}
-          restartPolicy: OnFailure
-          volumes: {{ toYaml .Values.cronjob.volumes | nindent 10 }}
-{{ end }}
+            - name: {{ .name }}
+              image: "{{ .image.name }}:{{ .image.tag }}"
+              resources:
+                limits:
+                  cpu: {{ .resources.limits.cpu }}
+                  memory: {{ .resources.limits.memory }}
+                requests:
+                  cpu: {{ .resources.requests.cpu }}
+                  memory: {{ .resources.requests.memory }}
+              restartPolicy: {{ .restartPolicy }}
+              {{- if .useVolume }}
+              volumeMounts: {{ toYaml .volumeMounts | nindent 16 }}
+              {{- end }}
+              {{- if .env }}
+              env: {{ toYaml .env | nindent 16 }}
+              {{- end }}
+          {{- if .useVolume }}
+          volumes: {{ toYaml .volumes | nindent 12 }}
+          {{- end }}
+{{- end }}
+{{- end }}

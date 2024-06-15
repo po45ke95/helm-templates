@@ -10,21 +10,21 @@ metadata:
     app: {{ .name }}
   annotations:
     {{- if .configReload.enabled }}
-    reloader.stakater.com/auto: "true"
+    reloader.sttakater.com/auto: "true"
     {{- end }}
 spec:
   selector:
     matchLabels:
       app: {{ .name }}
-    template:
-      metadata:
+  template:
+    metadata:
       labels:
         app: {{ .name }}
-      spec:
-        containers:
+    spec:
+      containers:
         - name: {{ .name }}
-          image: "{{ $.Values.image.name }}:{{ $.Values.image.tag }}"
-          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          imagePullPolicy: {{ .image.pullPolicy }}
+          image: "{{ .image.name }}:{{ .image.tag }}"
           resources:
             limits:
               cpu: {{ .resources.limits.cpu }}
@@ -36,7 +36,8 @@ spec:
             - containerPort: {{ .port }}
           {{- if .useVolume }}
           volumeMounts: {{ toYaml .volumeMounts | nindent 12 }}
-          {{- else }}
+          {{- end }}
+          {{- if .env }}
           env: {{ toYaml .env | nindent 12 }}
           {{- end }}
       {{- if .useVolume }}

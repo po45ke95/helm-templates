@@ -1,0 +1,212 @@
+---
+# Source: app/templates/configMap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sample-cm
+  namespace: sample
+data:
+  
+  example.json: |
+
+    {
+      "id": 20,
+      "name": "Item_98",
+      "price": 39.12,
+      "is_available": false,
+      "tags": [
+          "book",
+          "tool",
+          "clothing"
+      ],
+      "dimensions": {
+          "width": 7,
+          "height": 20,
+          "depth": 14
+      },
+      "manufacturer": {
+          "name": "Company_1",
+          "location": "Japan"
+      },
+      "date": "2017-03-28"
+    }
+    
+  
+  example.yaml: |
+
+    key1: value1
+    key2: value2
+    key3:
+      key3-1: value3-1
+---
+# Source: app/templates/svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample1
+  namespace: sample
+spec:
+  type: NodePort
+  selector:
+    app: sample1
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+# Source: app/templates/svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample2
+  namespace: sample
+spec:
+  type: NodePort
+  selector:
+    app: sample2
+  ports:
+    - protocol: TCP
+      port: 81
+      targetPort: 81
+---
+# Source: app/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample1
+  namespace: sample
+  labels:
+    app: sample1
+  annotations:
+    reloader.sttakater.com/auto: "true"
+spec:
+  selector:
+    matchLabels:
+      app: sample1
+  template:
+    metadata:
+      labels:
+        app: sample1
+    spec:
+      containers:
+        - name: sample1
+          imagePullPolicy: Always
+          image: "sample.acer.com/sample:latest"
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          ports:
+            - containerPort: 80
+          volumeMounts: 
+            - mountPath: /sample/sample1.json
+              name: sample1-volume
+              subPath: sample1.json
+      volumes: 
+          - configMap:
+              name: sample1-cm
+            name: sample1-volume
+---
+# Source: app/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample2
+  namespace: sample
+  labels:
+    app: sample2
+  annotations:
+    reloader.sttakater.com/auto: "true"
+spec:
+  selector:
+    matchLabels:
+      app: sample2
+  template:
+    metadata:
+      labels:
+        app: sample2
+    spec:
+      containers:
+        - name: sample2
+          imagePullPolicy: Always
+          image: "sample.acer.com/sample2:latest"
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          ports:
+            - containerPort: 81
+          env: 
+            - name: SAMPLE_ENV_VAR
+              value: sample-value
+---
+# Source: app/templates/cronjob.yaml
+apiVersion: betch/v1
+kind: CronJob
+metadata:
+  name: sample1-cronjob
+  namespace: sample
+  labels:
+    app: sample1-cronjob
+spec:
+  schedule: 0 0 * * *
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: sample1-cronjob
+              image: "sample.acer.com/sample1-cronjob:latest"
+              resources:
+                limits:
+                  cpu: 300m
+                  memory: 256Mi
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+              restartPolicy: OnFailure
+              volumeMounts: 
+                - mountPath: /sample/sample.json
+                  name: sample-cronjob-volume
+                  subPath: sample.json
+          volumes: 
+            - configMap:
+                name: sample-cm
+              name: sample-cronjob-volume
+---
+# Source: app/templates/cronjob.yaml
+apiVersion: betch/v1
+kind: CronJob
+metadata:
+  name: sample2-cronjob
+  namespace: sample
+  labels:
+    app: sample2-cronjob
+spec:
+  schedule: 0 1 * 2 *
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: sample2-cronjob
+              image: "sample.acer.com/sample2-cronjob:latest"
+              resources:
+                limits:
+                  cpu: 300m
+                  memory: 256Mi
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+              restartPolicy: OnFailure
+              env: 
+                - name: SAMPLE_ENV_VAR1
+                  value: sample-cronjob-value1
