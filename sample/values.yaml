@@ -1,40 +1,58 @@
-env: default
 namespace: sample
 
-deployment:
-  enabled: true
-
-app:
-  name: sample
-  port: 80
-  targetPort: 80
-  service:
-    type: NodePort
-  resources:
-    limits:
-      cpu: 300m
-      memory: 256Mi
-    requests: 
-      cpu: 100m
-      memory: 128Mi
-  volumeMounts:
-    - name: sample-volume
-      mountPath: /sample/sample.json
-      subPath: sample.json
-  volumes:
-    - name: sample-volume
-      configMap:
-        name: sample-cm
-  configReload:
+deployments:
+  - name: sample1
     enabled: true
+    port: 80
+    targetPort: 80
+    service:
+      type: NodePort
+    resources:
+      limits:
+        cpu: 300m
+        memory: 256Mi
+      requests: 
+        cpu: 100m
+        memory: 128Mi
+    useVolume: true
+    volumeMounts:
+      - name: sample1-volume
+        mountPath: /sample/sample1.json
+        subPath: sample1.json
+    volumes:
+      - name: sample1-volume
+        configMap:
+          name: sample1-cm
+    configReload:
+      enabled: true
+
+  - name: sample2
+    enabled: true
+    port: 81
+    targetPort: 81
+    service:
+      type: NodePort
+    resources:
+      limits:
+        cpu: 300m
+        memory: 256Mi
+      requests: 
+        cpu: 100m
+        memory: 128Mi
+    useVolume: false
+    env:
+      - name: SAMPLE_ENV_VAR
+        value: "sample-value"
+    configReload:
+      enabled: true
+
+# image:
+#   name: sample.acer.com/sample
+#   pullPolicy: Always
+#   tag: latest
 
 configMap:
   name: sample-cm
-
-image:
-  name: sample.acer.com/sample
-  pullPolicy: Always
-  tag: latest
 
 ingress:
   enabled: false
@@ -44,9 +62,7 @@ ingress:
   crt: xxx
   key: xxx
 
-
-cronjob:
-  enabled: false
+cronjobs:
   schedule: "0 0 * * *"
   image:
     name: sample.acer.com/sample-cronjob
