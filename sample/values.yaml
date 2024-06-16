@@ -1,5 +1,7 @@
 namespace: sample
 
+### Deployments
+### Define deployment arguments
 deployments:
   - name: sample1
     enabled: true
@@ -58,13 +60,28 @@ deployments:
 configMap:
   name: sample-cm
 
+
 ingress:
-  enabled: false
-  name: sample-ingress
-  secretName: sample-tls
-  hostname: sample.intra.acer.com
+  enabled: true
   crt: xxx
   key: xxx
+  name: sample-ingress
+  secretName: sample-tls
+  hosts:
+    - hostname: sample.intra.acer.com
+      paths:
+        - path: /
+          backend:
+            serviceName: sample1-svc
+        - path: /api
+          backend:
+            serviceName: sample2-svc
+    - hostname: another.sample.intra.acer.com
+      paths:
+        - path: /
+          backend:
+            serviceName: sample1-svc
+
 
 cronjobs:
   - name: sample1-cronjob
@@ -93,7 +110,7 @@ cronjobs:
           name: sample-cm
 
   - name: sample2-cronjob
-    enabled: true
+    enabled: false
     schedule: "0 1 * 2 *"
     concurrencyPolicy: Forbid
     restartPolicy: OnFailure

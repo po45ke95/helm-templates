@@ -1,4 +1,15 @@
 ---
+# Source: app/templates/tls.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sample-tls
+  namespace: sample
+type: kubernetes.io/tls
+data:
+  tls.crt: xxx
+  tls.key: xxx
+---
 # Source: app/templates/configMap.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -43,10 +54,10 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: sample1
+  name: sample1-svc
   namespace: sample
 spec:
-  type: NodePort
+  type: CluterIP
   selector:
     app: sample1
   ports:
@@ -58,10 +69,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: sample2
+  name: sample2-svc
   namespace: sample
 spec:
-  type: NodePort
+  type: CluterIP
   selector:
     app: sample2
   ports:
@@ -181,32 +192,47 @@ spec:
                 name: sample-cm
               name: sample-cronjob-volume
 ---
-# Source: app/templates/cronjob.yaml
-apiVersion: betch/v1
-kind: CronJob
+# Source: app/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
-  name: sample2-cronjob
+  name: sample-ingress
   namespace: sample
-  labels:
-    app: sample2-cronjob
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    external-dns.alpha.kubernetes.io/hostname: sample.intra.acer.com,another.sample.intra.acer.com
+    external-dns.alpha.kubernetes.io/ttl: "1"
 spec:
-  schedule: 0 1 * 2 *
-  concurrencyPolicy: Forbid
-  jobTemplate:
-    spec:
-      template:
-        spec:
-          containers:
-            - name: sample2-cronjob
-              image: "sample.acer.com/sample2-cronjob:latest"
-              resources:
-                limits:
-                  cpu: 300m
-                  memory: 256Mi
-                requests:
-                  cpu: 100m
-                  memory: 128Mi
-              restartPolicy: OnFailure
-              env: 
-                - name: SAMPLE_ENV_VAR1
-                  value: sample-cronjob-value1
+  tls:
+    - hosts:
+      - sample.intra.acer.com
+      - another.sample.intra.acer.com
+      secretName: sample-tls
+  rules:
+  - host: sample.intra.acer.com
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: sample1-svc
+              port:
+                number: 80
+        - path: /api
+          pathType: Prefix
+          backend:
+            service:
+              name: sample2-svc
+              port:
+                number: 81
+  - host: another.sample.intra.acer.com
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: sample1-svc
+              port:
+                number: 80

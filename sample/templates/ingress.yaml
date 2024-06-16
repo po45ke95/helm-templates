@@ -1,4 +1,5 @@
-{{ if .Values.ingress.enabled }}
+{{- if .Values.ingress.enabled }}
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -6,22 +7,28 @@ metadata:
   namespace: {{ .Values.namespace }}
   annotations:
     kubernetes.io/ingress.class: nginx
-    external-dns.alpha.kubernetes.io/hostname: {{ .Values.ingress.hostname }}
+    external-dns.alpha.kubernetes.io/hostname: {{ range $index, $element := .Values.ingress.hosts }}{{ if $index }},{{ end }}{{ $element.hostname }}{{ end }}
     external-dns.alpha.kubernetes.io/ttl: "1"
 spec:
   tls:
     - hosts:
-      - {{ .Values.ingress.hostname }}
+      {{- range .Values.ingress.hosts }}
+      - {{ .hostname }}
+      {{- end }}
       secretName: {{ .Values.ingress.secretName }}
   rules:
-  - host: {{ .Values.ingress.hostname }}
+    {{- range .Values.ingress.hosts }}
+  - host: {{ .hostname }}
     http:
       paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: {{ .Values.app.name }}
-            port:
-              number: {{ .Values.app.port }}
-{{ end }}
+        {{- range .paths }}
+        - path: {{ .path }}
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ .backend.serviceName }}
+              port:
+                number: {{ $backendServiceName := .backend.serviceName | replace "-svc" "" }}{{ range $.Values.deployments }}{{ if eq .name $backendServiceName }}{{ .port }}{{ end }}{{ end }}
+        {{- end }}
+    {{- end }}
+{{- end }}
