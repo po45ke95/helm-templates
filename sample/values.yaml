@@ -6,7 +6,7 @@ deployments:
   - name: sample1
     enabled: true
     image:
-      name: sample.acer.com/sample
+      name: example.com/sample
       pullPolicy: Always
       tag: latest
     port: 80
@@ -35,7 +35,7 @@ deployments:
   - name: sample2
     enabled: true
     image:
-      name: sample.acer.com/sample2
+      name: example.com/sample2
       pullPolicy: Always
       tag: latest
     port: 81
@@ -68,7 +68,7 @@ ingress:
   name: sample-ingress
   secretName: sample-tls
   hosts:
-    - hostname: sample.intra.acer.com
+    - hostname: sample.example.com
       paths:
         - path: /
           backend:
@@ -76,7 +76,7 @@ ingress:
         - path: /api
           backend:
             serviceName: sample2-svc
-    - hostname: another.sample.intra.acer.com
+    - hostname: another-sample.example.com
       paths:
         - path: /
           backend:
@@ -90,7 +90,7 @@ cronjobs:
     concurrencyPolicy: Forbid
     restartPolicy: OnFailure
     image:
-      name: sample.acer.com/sample1-cronjob
+      name: example.com/sample1-cronjob
       tag: latest
     resources:
       limits:
@@ -115,7 +115,7 @@ cronjobs:
     concurrencyPolicy: Forbid
     restartPolicy: OnFailure
     image:
-      name: sample.acer.com/sample2-cronjob
+      name: example.com/sample2-cronjob
       tag: latest
     resources:
       limits:

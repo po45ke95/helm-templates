@@ -57,7 +57,7 @@ metadata:
   name: sample1-svc
   namespace: sample
 spec:
-  type: CluterIP
+  type: ClusterIP
   selector:
     app: sample1
   ports:
@@ -72,7 +72,7 @@ metadata:
   name: sample2-svc
   namespace: sample
 spec:
-  type: CluterIP
+  type: ClusterIP
   selector:
     app: sample2
   ports:
@@ -102,7 +102,7 @@ spec:
       containers:
         - name: sample1
           imagePullPolicy: Always
-          image: "sample.acer.com/sample:latest"
+          image: "example.com/sample:latest"
           resources:
             limits:
               cpu: 300m
@@ -143,7 +143,7 @@ spec:
       containers:
         - name: sample2
           imagePullPolicy: Always
-          image: "sample.acer.com/sample2:latest"
+          image: "example.com/sample2:latest"
           resources:
             limits:
               cpu: 300m
@@ -174,7 +174,7 @@ spec:
         spec:
           containers:
             - name: sample1-cronjob
-              image: "sample.acer.com/sample1-cronjob:latest"
+              image: "example.com/sample1-cronjob:latest"
               resources:
                 limits:
                   cpu: 300m
@@ -200,16 +200,16 @@ metadata:
   namespace: sample
   annotations:
     kubernetes.io/ingress.class: nginx
-    external-dns.alpha.kubernetes.io/hostname: sample.intra.acer.com,another.sample.intra.acer.com
+    external-dns.alpha.kubernetes.io/hostname: sample.example.com,another-sample.example.com
     external-dns.alpha.kubernetes.io/ttl: "1"
 spec:
   tls:
     - hosts:
-      - sample.intra.acer.com
-      - another.sample.intra.acer.com
+      - sample.example.com
+      - another-sample.example.com
       secretName: sample-tls
   rules:
-  - host: sample.intra.acer.com
+  - host: sample.example.com
     http:
       paths:
         - path: /
@@ -226,7 +226,7 @@ spec:
               name: sample2-svc
               port:
                 number: 81
-  - host: another.sample.intra.acer.com
+  - host: another-sample.example.com
     http:
       paths:
         - path: /
