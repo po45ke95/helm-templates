@@ -8,7 +8,7 @@ metadata:
   namespace: {{ $.Values.namespace }}
 spec:
 {{- if $.Values.ingress.enabled }}
-  type: CluterIP
+  type: ClusterIP
 {{- else }}
   type: {{ .service.type }}
 {{- end }}
