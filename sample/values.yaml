@@ -1,3 +1,4 @@
+## Define where your application deploy
 namespace: sample
 
 ### Deployments
@@ -20,6 +21,7 @@ deployments:
       requests: 
         cpu: 100m
         memory: 128Mi
+## autoscale configuration for deployment.
     autoscale:
       enabled: true
       min: 1
@@ -28,6 +30,7 @@ deployments:
       policyType: Pods
       scaleUp: 1
       scaleDown: 1
+## Volume configuration for deployment.
     useVolume: true
     volumeMounts:
       - name: sample1-volume
@@ -37,6 +40,7 @@ deployments:
       - name: sample1-volume
         configMap:
           name: sample1-cm
+## Auto updated deployment when configMap upgrade.
     configReload:
       enabled: true
 
