@@ -20,6 +20,14 @@ deployments:
       requests: 
         cpu: 100m
         memory: 128Mi
+    autoscale:
+      enabled: true
+      min: 1
+      max: 3
+      targetCPUUtilizationPercentage: 75
+      policyType: Pods
+      scaleUp: 1
+      scaleDown: 1
     useVolume: true
     volumeMounts:
       - name: sample1-volume
@@ -49,6 +57,14 @@ deployments:
       requests: 
         cpu: 100m
         memory: 128Mi
+    autoscale:
+      enabled: true
+      min: 1
+      max: 3
+      targetCPUUtilizationPercentage: 75
+      policyType: Pods
+      scaleUp: 1
+      scaleDown: 1
     useVolume: false
     env:
       - name: SAMPLE_ENV_VAR
@@ -60,7 +76,8 @@ deployments:
 configMap:
   name: sample-cm
 
-
+## Ingress configuration
+## Define ingress arguments
 ingress:
   enabled: true
   crt: xxx
@@ -82,7 +99,8 @@ ingress:
           backend:
             serviceName: sample1-svc
 
-
+## Cronjobs configuration
+## Define cronjobs arguments
 cronjobs:
   - name: sample1-cronjob
     enabled: true
